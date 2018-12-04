@@ -1,0 +1,3 @@
+[run]
+source = tokenstore
+omit = tokenstore/tests/*

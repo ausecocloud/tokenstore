@@ -1,0 +1,4 @@
+include *.txt *.ini *.rst
+recursive-include src *.txt *.yaml
+recursive-include src/tokenstore/alembic *.mako *.py
+

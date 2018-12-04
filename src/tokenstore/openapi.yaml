@@ -1,0 +1,293 @@
+openapi: "3.0.2"
+info:
+  title: "Token manager"
+  version: "1.0.0"
+  description: |
+    # Introduction
+
+    A small API service to manage third party OAuth2 auhtorizations, and token refresh.
+    It's main purpose is to manage offline tokens to third party OAuth2 services.
+  # termsOfService: "http://swagger.io/terms/"
+  # contact:
+  #   email: ""
+  #   name:
+  #   url:
+  # license:
+  #   name: "Apache 2.0"
+  #   url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+# servers:
+#   - url:
+#     description:
+#     variables:
+security:
+  - token_auth: []
+components:
+  parameters:
+    provider:
+      name: provider
+      in: path
+      description: "A OAuth2 provider id supported by token service. Use /auhtorizations to discover available providers."
+      allowEmptyValue: false
+      schema:
+        type: string
+  schemas:
+    Authorization:
+      type: object
+      required: ["provider", "active"]
+      properties:
+        provider:
+          type: string
+        active:
+          type: boolean
+        # actions
+        authorize:
+          type: string
+        token:
+          type: string
+        revoke:
+          type: string
+        # metadata
+        name:
+          type: string
+        url:
+          type: string
+        icon:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+    Token:
+      type: object
+      required: ["access_token", "expires_in", "token_type", "expires_at"]
+      properties:
+        access_token:
+          description: base64 encoded token
+          type: string
+        expires_in:
+          type: integer
+        expires_at:
+          type: number
+        token_type:
+          type: string
+
+  responses:
+    "BadRequest":
+      description: "Bad request, most likely due to malformed parameters."
+    "NotFound":
+      description: "Resource not found."
+    "Forbidden":
+      description: "Forbidden. User is not allowed to perform the request."
+    "Success":
+      description: "Request sucessfully executed."
+
+  # parameters:
+  # examples:
+  # requestBodies:
+  # headers:
+  securitySchemes:
+    # <key>: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#security-scheme-object
+    #   type: apiKey, http, oauth2, openIdConnect
+    #   description:
+    #   name: name of header, query or cookie parameter
+    #   in: query, header, cookie
+    #   scheme: bearer
+    #   bearerFormat: JWT
+    #   flows:
+    #   openIdConnectUrl:
+    # workspace_auth:
+    #   type: openIdConnect
+    #   description: use openIdConnect for auth
+    #   openIdConnectUrl: https://auth.ecocloud.org.au/auth/realms/test/.well-known/openid-configuration
+    token_auth:
+      type: http
+      description: send Authorization header with bearer token
+      scheme: bearer
+    # cookie_auth:
+    #   type: apiKey
+    #   description: use cookies to authenticate
+    #   name: oidc.session
+    #   in: cookie
+    # oauth:
+    #   type: oauth2
+    #   flows:
+    #     implicit:
+    #       authorizationUrl:
+    #       tokenUrl:
+    #       refreshUrl:
+    #       scopes:
+    #         scope1: use this to do what
+    #         scope2: sope2 description
+    #     authorizationCode:
+    #       authorizationUrl:
+    #       tokenUrl:
+    #       refreshUrl:
+    #       scopes:
+    #         scope1: use this to do what
+    #         scope2: sope2 description
+  # links:
+  # callbacks:
+tags:
+  - name: discover
+  - name: authorizations
+# externalDocs
+paths:
+  /api/v1/auhtorizations:
+    summary: "Return list of available OAuth2 providers and current authorization status."
+    description: ""
+    get:
+      tags:
+        - discover
+      summary: "List of authorizations"
+      description: ""
+      operationId: "authorizations"
+      responses:
+        "200":
+          description: "List of authorizations"
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Authorization"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/{provider}/authorize:
+    summary: "Start OAuth2 authorization with provider"
+    description: ""
+    get:
+      tags:
+        - authorizations
+      summary: "Redirect to providers authorize page"
+      # security
+      operationId: "authorize"
+      # externalDocs:
+      parameters:
+        - $ref: '#/components/parameters/provider'
+        - name: referer
+          description: final URL to redirect to, after OAuth authorization process finishes.
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: "Redirect to provider authorize endpoint."
+          headers:
+            Location:
+              description: "URL to start authorization with provider."
+              schema:
+                type: string
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - authorizations
+      summary: "Return provider authorize url in Location header."
+      # security
+      operationId: "authorize"
+      # externalDocs:
+      parameters:
+        - $ref: '#/components/parameters/provider'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                referer:
+                  description: final URL to redirect to, after OAuth authorization process finishes.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                referer:
+                  description: final URL to redirect to, after OAuth authorization process finishes.
+                  type: string
+      responses:
+        "201":
+          description: "Success. Returns url to redirect to provider authorize endpoint."
+          headers:
+            Location:
+              description: "URL to start authorization with provider."
+              schema:
+                type: string
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/{provider}/redirect_uri:
+    summary: "OAuth2 redirect handler "
+    description: ""
+    get:
+      tags:
+        - authorizations
+      summary: "Handle OAuth2 redirect"
+      # security
+      operationId: "redirect_uri"
+      # externalDocs:
+      # TODO: document OAuth2 redirect parameters?
+      parameters:
+        - $ref: '#/components/parameters/provider'
+      #   - in: "query"
+      #     name: "path"
+      #     description: "File Path"
+      #     required: true
+      #     schema:
+      #       type: string
+      responses:
+        "302":
+          description: "Redirect to final original referer."
+
+  /api/v1/{provider}/token:
+    summary: "Get access token for provider"
+    description: ""
+    get:
+      tags:
+        - authorizations
+      summary: "Get access token for provider"
+      # security
+      operationId: "token"
+      # externalDocs:
+      parameters:
+        - $ref: '#/components/parameters/provider'
+      responses:
+        "200":
+          description: "An access token structure for provider."
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Token"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/{provider}/revoke:
+    summary: "Revoke refresh token for provider"
+    description: ""
+    post:
+      tags:
+        - authorizations
+      summary: "Remove authorization for provider."
+      # security
+      operationId: "revoke"
+      # externalDocs:
+      parameters:
+        - $ref: '#/components/parameters/provider'
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
