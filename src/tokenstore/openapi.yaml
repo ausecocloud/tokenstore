@@ -5,7 +5,7 @@ info:
   description: |
     # Introduction
 
-    A small API service to manage third party OAuth2 auhtorizations, and token refresh.
+    A small API service to manage third party OAuth2 authorizations, and token refresh.
     It's main purpose is to manage offline tokens to third party OAuth2 services.
   # termsOfService: "http://swagger.io/terms/"
   # contact:
@@ -26,7 +26,7 @@ components:
     provider:
       name: provider
       in: path
-      description: "A OAuth2 provider id supported by token service. Use /auhtorizations to discover available providers."
+      description: "A OAuth2 provider id supported by token service. Use /authorizations to discover available providers."
       allowEmptyValue: false
       schema:
         type: string
@@ -132,7 +132,7 @@ tags:
   - name: authorizations
 # externalDocs
 paths:
-  /api/v1/auhtorizations:
+  /api/v1/authorizations:
     summary: "Return list of available OAuth2 providers and current authorization status."
     description: ""
     get:
