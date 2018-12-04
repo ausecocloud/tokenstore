@@ -131,7 +131,7 @@ class FunctionalTestCase(unittest.TestCase):
         Base.metadata.create_all(app.registry['dbsession_factory']().bind)
 
         from webtest import TestApp
-        self.testapp = TestApp(app)
+        self.testapp = TestApp(app, extra_environ={'wsgi.url_scheme': 'https'})
 
     def _user_token(self, exp=300, aud='example_client_id'):
         return gen_jwt({

@@ -18,14 +18,20 @@ PREFIX = hub.bccvl.org.au/ecocloud
 IMAGE = tokenstore
 TAG ?= 0.1.0
 
+VOLUMES = -v $(PWD):/tokenstore
+WORKDIR = -w /tokenstore
+PORTS = -p 6543:6543
+ARGS = $(VOLUMES) $(WORKDIR)
+
+
 build:
 	docker build -t $(PREFIX)/$(IMAGE):$(TAG) .
 
 dev:
-	docker run --rm -it -p 6543:6543 -v $(PWD):/tokenstore tokenstore $(PREFIX)/$(IMAGE):$(TAG) bash
+	docker run --rm -it $(PORTS) $(ARGS) $(PREFIX)/$(IMAGE):$(TAG) bash
 
 migrate:
-	docker run --rm -it -v $(PWD):/tokenstore tokenstore $(PREFIX)/$(IMAGE):$(TAG) alembic -c /tokenstore/development.ini upgrade head
+	docker run --rm -it $(ARGS) $(PREFIX)/$(IMAGE):$(TAG) alembic -c /tokenstore/development.ini upgrade head
 
 push:
 	docker push $(PREFIX)/$(IMAGE):$(TAG)

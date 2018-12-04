@@ -41,3 +41,17 @@ Getting Started
 - Run your project.
 
     env/bin/pserve development.ini
+
+
+Use Docker
+----------
+
+- build initital image
+
+    make build
+
+- run tests in container
+
+    make dev
+    pip install -e ".[test]"
+    pytest
