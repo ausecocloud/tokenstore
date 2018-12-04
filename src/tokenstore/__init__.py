@@ -49,6 +49,6 @@ def main(global_config, **settings):
                 utility.metadata[key[len(metadata_prefix):]] = settings[key]
             config.registry.registerUtility(utility, IOIDCUtility, name=provider)
 
-        config.scan()
+        config.scan('.views')
 
         return config.make_wsgi_app()
