@@ -14,7 +14,7 @@ def authorize(request):
         params = request.oas.validate_params()
         providerid = params.parameters.get('path', {}).get('provider')
         referer = (params.parameters.get('query', {}).get('referer') or
-                   params.body and params.body.referer)
+                   getattr(params.body, 'referer', None))
     except InvalidMediaTypeValue:
         # workaround openapi-core not correctly validating empty request body
         providerid = request.matchdict['provider']
