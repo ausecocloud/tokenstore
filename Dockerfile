@@ -14,7 +14,7 @@ RUN pip install --no-cache --upgrade pip setuptools \
      https://github.com/ausecocloud/pyramid_openapi/archive/7425984b9444fe64974f877b1a788c48ee834bd2.zip
 
 RUN pip install --no-cache \
-    https://github.com/ausecocloud/tokenstore/archive/c859cfca6f65c12e828421c3f8c23762c979a9ca.zip
+    https://github.com/ausecocloud/tokenstore/archive/2be3c0bb7b92079125bb5d7b7102619c5d9b8ccc.zip
 
 COPY development.ini /etc/tokenstore/tokenstore.ini
 
