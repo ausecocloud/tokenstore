@@ -59,11 +59,11 @@ def redirect_uri(request):
         )
         dbsession.add(refresh_token)
     # update refresh_token
-    refresh_token.token = token['refresh_token']
+    refresh_token.token = request.registry['tokenstore.crypto'].encrypt(token['refresh_token'])
     refresh_token.expires_in = token['refresh_expires_in']
     # parse refresh_token
     refresh_token_decoded = provider.validate_token(
-        refresh_token.token,
+        token['refresh_token'],
         verify_exp=refresh_token.expires_in != 0
     )
     # TODO: check if there is really a value for 'exp'

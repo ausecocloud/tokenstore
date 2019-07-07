@@ -7,6 +7,7 @@ from pyramid_oidc.authentication import OIDCBearerAuthenticationPolicy
 from pyramid_oidc.authentication.keycloak import keycloak_callback
 
 from .resources import Root
+from .utilities import CryptoTool
 
 
 def main(global_config, **settings):
@@ -31,6 +32,8 @@ def main(global_config, **settings):
         )
         config.set_authentication_policy(authn_policy)
         config.set_authorization_policy(ACLAuthorizationPolicy())
+
+        config.registry['tokenstore.crypto'] = CryptoTool(config)
 
         # setup apps
         # newline / space separated list of providers key to look for.

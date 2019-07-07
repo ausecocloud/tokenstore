@@ -124,6 +124,8 @@ class FunctionalTestCase(unittest.TestCase):
                     'session.dogpile_opts.expiration_timeout': '1200',
 
                     'openapi.spec': 'tokenstore:openapi.yaml',
+
+                    'tokenstore.cryptokey': '47fc5aea29aea2f9b49ab8fdc3c87ad2da6245da2d16a32c8cac1c2ec2ffb5ac',
                 }
             )
 

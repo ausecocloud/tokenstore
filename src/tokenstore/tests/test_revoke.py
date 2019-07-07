@@ -8,10 +8,11 @@ class TestRevoke(FunctionalTestCase):
         super().setUp()
         from ..models import RefreshToken
 
-        dbsession = self.testapp.app.registry['dbsession_factory']()
+        registry = self.testapp.app.registry
+        dbsession = registry['dbsession_factory']()
         dbsession.add(RefreshToken(
             provider='provider',
-            token='broken token',
+            token=registry['tokenstore.crypto'].encrypt('broken token'),
             expires_in=0,
             expires_at=datetime.utcnow().timestamp() + 3600,
             user_id=USER_ID,

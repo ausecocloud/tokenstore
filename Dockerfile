@@ -1,7 +1,5 @@
 FROM python:3.6-slim-stretch
 
-
-
 RUN pip install --no-cache --upgrade pip setuptools \
  && pip install --no-cache --upgrade \
      gunicorn \

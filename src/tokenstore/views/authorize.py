@@ -36,7 +36,7 @@ def authorize(request):
         }
     }
 
-    # Redirect to authorization endpoint and state session state cookie
+    # Redirect to authorization endpoint and set session state cookie
     if request.method == 'GET':
         return HTTPFound(url)
     else:

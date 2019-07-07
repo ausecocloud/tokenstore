@@ -4,6 +4,7 @@ from sqlalchemy import (
     Integer,
     Text,
     Float,
+    LargeBinary,
 )
 
 from .meta import Base
@@ -13,7 +14,7 @@ class RefreshToken(Base):
     __tablename__ = 'refresh_tokens'
     id = Column(Integer, primary_key=True)
     provider = Column(Text, index=True)
-    token = Column(Text)
+    token = Column(LargeBinary)
     expires_in = Column(Integer)
     expires_at = Column(Float)
     user_id = Column(Text, index=True)

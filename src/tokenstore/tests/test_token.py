@@ -11,15 +11,16 @@ class TestToken(FunctionalTestCase):
         super().setUp()
         from ..models import RefreshToken
 
-        dbsession = self.testapp.app.registry['dbsession_factory']()
+        registry = self.testapp.app.registry
+        dbsession = registry['dbsession_factory']()
         dbsession.add(RefreshToken(
             provider='provider',
-            token=gen_jwt({
+            token=registry['tokenstore.crypto'].encrypt(gen_jwt({
                 'iss': PROVIDER,
                 'exp': int(datetime.utcnow().timestamp()) + 3600,
                 'aud': 'provider_client_id',
                 'sub': 'provider_user_id',
-            }),
+            })),
             expires_in=0,
             expires_at=datetime.utcnow().timestamp() + 3600,
             user_id=USER_ID,

@@ -30,9 +30,10 @@ def token(request):
         return HTTPBadRequest()
 
     # we fetch a new access_token in any case
+    cur_token = request.registry['tokenstore.crypto'].decrypt(refresh_token.token)
     oauth = provider.get_oauth2_session(
         request,
-        token={'refresh_token': refresh_token.token}
+        token={'refresh_token': cur_token}
     )
     try:
         # TODO: move this into OIDCUtitlity?
@@ -49,11 +50,11 @@ def token(request):
 
     # parse refresh_token
     refresh_token_decoded = provider.validate_token(
-        refresh_token.token,
-        verify_exp=refresh_token.expires_in != 0
+        oauth.token['refresh_token'],
+        verify_exp=oauth.token['refresh_expires_in'] != 0
     )
     # update refresh token
-    refresh_token.token = oauth.token['refresh_token']
+    refresh_token.token = request.registry['tokenstore.crypto'].encrypt(oauth.token['refresh_token'])
     refresh_token.expires_in = oauth.token['refresh_expires_in']
     # TODO: check if there is really a value for 'exp'
     refresh_token.expires_at = refresh_token_decoded['exp']
